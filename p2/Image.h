@@ -20,6 +20,7 @@ class Image
 		int getColorDepth(void);
 		vector <vector <unsigned short int>> getDataMatrix(void);
 		vector <vector <unsigned short int>> getInvertedColorMatrix(void);
+		vector <vector <unsigned short int>> getBinaryMatrix(int);
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
 
 	private:

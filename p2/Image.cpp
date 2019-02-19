@@ -134,6 +134,7 @@ void Image::readImage(string file)
 		}
 		else if (line ==  "P3")
 		{
+			// Procesing image headers
 			magic = line;
 			line = getNextLine();
 
@@ -206,6 +207,40 @@ vector <vector <unsigned short int>> Image::getInvertedColorMatrix(void)
 	return invDataMatrix;
 }
 
+vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
+{
+	/* Binary Algorithm
+		For each pixel p in matrix:
+			For each channel c in pixel:
+				binaryColor = if c is >=  than treshold, c = 1 else = 0 
+				push binaryColor to binaryPixel
+			push binaryPixel to binaryMatrix
+	*/
+	int matrixSize = matrix.size();
+	int channels = matrix[0].size(); 
+
+	vector <vector<unsigned short int>> binaryMatrix;
+	
+	// For every pixel p in image matrix
+	for (int p = 0; p < matrixSize; p++)
+	{
+		vector <unsigned short int> binaryPixel;
+		
+		// For every channel c in each pixel
+		for (int c = 0; c < channels; c++)
+		{
+			unsigned short int newCol = matrix[p][c] >= limit ? 255 : 0;
+
+			// Push binary color to inverted pixel
+			binaryPixel.push_back(newCol);
+		}
+		// Push binary pixel to inverted matrix
+		binaryMatrix.push_back(binaryPixel);
+	}
+
+	return binaryMatrix;
+}
+
 void Image::printImageToFile(string path = "", vector <vector <unsigned short int>> img =  vector <vector <unsigned short int>>())
 {
 	// Verify valid path is provided
@@ -236,6 +271,8 @@ void Image::printImageToFile(string path = "", vector <vector <unsigned short in
 				newImg << endl;
 			}
 		}
+
+		newImg.close();
 	}
 	else 
 	{

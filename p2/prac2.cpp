@@ -19,5 +19,7 @@ int main(int argc, char const *argv[])
 	vector <vector <unsigned short int >> img = ppmExample.getDataMatrix();
 
 	ppmExample.printImageToFile("../res/inverted.ppm", ppmExample.getInvertedColorMatrix());
+	ppmExample.printImageToFile("../res/binary.ppm", ppmExample.getBinaryMatrix(128));
+
 	return 0;
 }
