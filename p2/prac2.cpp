@@ -20,6 +20,7 @@ int main(int argc, char const *argv[])
 
 	ppmExample.printImageToFile("../res/inverted.ppm", ppmExample.getInvertedColorMatrix());
 	ppmExample.printImageToFile("../res/binary.ppm", ppmExample.getBinaryMatrix(128));
+	ppmExample.printImageToFile("../res/grayscale2.ppm", ppmExample.getGrayscaleMatrix());
 
 	return 0;
 }

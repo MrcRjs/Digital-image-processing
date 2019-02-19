@@ -241,6 +241,47 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 	return binaryMatrix;
 }
 
+vector <vector <unsigned short int>> Image::getGrayscaleMatrix(void)
+{
+	/* Grayscale Algorithm
+		For each pixel p in matrix:
+			grayscalePixel = 0.2126 * r + 0.7512 * g + 0.0722 * b
+			push grayscalePixel to grayscaleMatrix
+	*/
+
+	int matrixSize = matrix.size();
+	int channels = matrix[0].size(); 
+
+	vector <vector<unsigned short int>> grayScaleMatrix;
+	
+	// For every pixel p in image matrix
+	for (int p = 0; p < matrixSize; p++)
+	{
+		vector <unsigned short int> grayscalePixel;
+		
+		unsigned short int r = matrix[p][0];
+		unsigned short int g = matrix[p][1];
+		unsigned short int b = matrix[p][2];
+
+		// Colorimetric (perceptual luminance-preserving)
+		// https://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
+		unsigned short int grayPixelColor = (0.2126 * r) + (0.7512 * g) + (0.0722 * b);
+
+		// Luma
+		//unsigned short int grayPixelColor = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+		// For every channel c in each pixel
+		for (int c = 0; c < channels; c++)
+		{
+			grayscalePixel.push_back(grayPixelColor);
+		}
+		// Push binary pixel to inverted matrix
+		grayScaleMatrix.push_back(grayscalePixel);
+	}
+
+	return grayScaleMatrix;
+}
+
 void Image::printImageToFile(string path = "", vector <vector <unsigned short int>> img =  vector <vector <unsigned short int>>())
 {
 	// Verify valid path is provided
