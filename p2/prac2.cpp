@@ -1,4 +1,5 @@
 #include "Image.h"
+#include <string>
 
 using namespace std;
 
@@ -7,8 +8,10 @@ int main(int argc, char const *argv[])
 	// To Compile:
 	// g++ -o p2 prac2.cpp Image.cpp
 	Image ppmExample;
-	ppmExample.readImage("../res/imagen.ppm");
-	
+	string resourcesDir = "../res/";
+	string imageFile = "panda";
+	ppmExample.readImage(resourcesDir + imageFile + ".ppm");
+	//ppmExample.matrix[0][1] = 255;
 	// Simplified using constructor
 	// Image ppmExample = new Image("../res/imagen2.ppm");
 
@@ -18,9 +21,11 @@ int main(int argc, char const *argv[])
 	// http://www.cplusplus.com/reference/vector/vector/
 	vector <vector <unsigned short int >> img = ppmExample.getDataMatrix();
 
-	ppmExample.printImageToFile("../res/inverted.ppm", ppmExample.getInvertedColorMatrix());
-	ppmExample.printImageToFile("../res/binary.ppm", ppmExample.getBinaryMatrix(128));
-	ppmExample.printImageToFile("../res/grayscale2.ppm", ppmExample.getGrayscaleMatrix());
+	ppmExample.printImageToFile(resourcesDir + imageFile + "-inverted.ppm", ppmExample.getInvertedColorMatrix());
+	ppmExample.printImageToFile(resourcesDir + imageFile + "-binary.ppm", ppmExample.getBinaryMatrix(128));
+	ppmExample.printImageToFile(resourcesDir + imageFile +"-grayscale-perceptual.ppm", ppmExample.getGrayscaleMatrix("perceptual"));
+	ppmExample.printImageToFile(resourcesDir + imageFile +"-grayscale-luma.ppm", ppmExample.getGrayscaleMatrix("luma"));
+	ppmExample.printImageToFile(resourcesDir + imageFile +"-red-filter.ppm", ppmExample.getFilteredMatrix());
 
 	return 0;
 }

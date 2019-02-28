@@ -57,6 +57,7 @@ void Image::populateMatrix()
 		// r:0 g:1 b:2
 		unsigned short int curChan = 0;
 		
+		vector <unsigned short int> pixel;
 		// While image data in file
 		while(!ppmImage.eof())
 		{
@@ -70,7 +71,6 @@ void Image::populateMatrix()
 			unsigned short int cVal;
 
 			// Temporary pixel used to store each value for rgb
-			vector <unsigned short int> pixel;
 
 			// while there's a color value integer in line
 			while(stream >> cVal)
@@ -80,14 +80,11 @@ void Image::populateMatrix()
 
 				// After setting rgb color values for the pixel
 				// pixel is pushed to matrix
-				curChan++;
-				if (curChan == 3)
+				if (pixel.size() == 3)
 				{
 					matrix.push_back(pixel);
 					// pixel is cleared to store next values
 					pixel = vector <unsigned short int>();
-					// current channel set again to r : 0
-					curChan = 0;
 				}
 
 			}
@@ -229,7 +226,7 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 		// For every channel c in each pixel
 		for (int c = 0; c < channels; c++)
 		{
-			unsigned short int newCol = matrix[p][c] >= limit ? 255 : 0;
+			unsigned short int newCol = matrix[p][c] >= limit ? colorDepth : 0;
 
 			// Push binary color to inverted pixel
 			binaryPixel.push_back(newCol);
@@ -241,7 +238,31 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 	return binaryMatrix;
 }
 
-vector <vector <unsigned short int>> Image::getGrayscaleMatrix(void)
+vector <vector <unsigned short int>> Image::getFilteredMatrix(void)
+{
+	auto grayMat = getGrayscaleMatrix("perceptual");
+
+	int matrixSize = grayMat.size(); 
+
+	vector <vector<unsigned short int>> filteredMatrix;
+	
+	// For every pixel p in image matrix
+	for (int p = 0; p < matrixSize; p++)
+	{
+		vector <unsigned short int> pixel;
+
+		//pixel.push_back(0);
+		//pixel.push_back(0);
+		pixel.push_back(grayMat[p][0]);
+		//pixel.push_back(grayMat[p][0]);
+		pixel.push_back(0);
+		pixel.push_back(0);
+		filteredMatrix.push_back(pixel);
+	}
+	return filteredMatrix;
+};
+
+vector <vector <unsigned short int>> Image::getGrayscaleMatrix(string type = "perceptual")
 {
 	/* Grayscale Algorithm
 		For each pixel p in matrix:
@@ -263,12 +284,20 @@ vector <vector <unsigned short int>> Image::getGrayscaleMatrix(void)
 		unsigned short int g = matrix[p][1];
 		unsigned short int b = matrix[p][2];
 
-		// Colorimetric (perceptual luminance-preserving)
-		// https://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
-		unsigned short int grayPixelColor = (0.2126 * r) + (0.7512 * g) + (0.0722 * b);
+		unsigned short int grayPixelColor;
 
-		// Luma
-		//unsigned short int grayPixelColor = (0.299 * r) + (0.587 * g) + (0.114 * b);
+		if (type == "perceptual")
+		{
+			// Colorimetric (perceptual luminance-preserving)
+			// https://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
+			grayPixelColor = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+		} else if (type == "luma"){
+			// Luma
+			grayPixelColor = (0.299 * r) + (0.587 * g) + (0.114 * b);
+		} else {
+			// Use perceptual as
+			grayPixelColor = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+		}
 
 		// For every channel c in each pixel
 		for (int c = 0; c < channels; c++)

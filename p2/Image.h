@@ -21,7 +21,8 @@ class Image
 		vector <vector <unsigned short int>> getDataMatrix(void);
 		vector <vector <unsigned short int>> getInvertedColorMatrix(void);
 		vector <vector <unsigned short int>> getBinaryMatrix(int);
-		vector <vector <unsigned short int>> getGrayscaleMatrix(void);
+		vector <vector <unsigned short int>> getGrayscaleMatrix(string);
+		vector <vector <unsigned short int>> getFilteredMatrix(void);
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
 
 	private:
