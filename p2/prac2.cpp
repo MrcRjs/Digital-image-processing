@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
 	// g++ -o p2 prac2.cpp Image.cpp
 	Image ppmExample;
 	string resourcesDir = "../res/";
-	string imageFile = "panda";
+	string imageFile = "brain";
 	ppmExample.readImage(resourcesDir + imageFile + ".ppm");
 	//ppmExample.matrix[0][1] = 255;
 	// Simplified using constructor
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
 	vector <vector <unsigned short int >> img = ppmExample.getDataMatrix();
 
 	ppmExample.printImageToFile(resourcesDir + imageFile + "-inverted.ppm", ppmExample.getInvertedColorMatrix());
-	ppmExample.printImageToFile(resourcesDir + imageFile + "-binary.ppm", ppmExample.getBinaryMatrix(128));
+	ppmExample.printImageToFile(resourcesDir + imageFile + "-binary.ppm", ppmExample.getBinaryMatrix(100));
 	ppmExample.printImageToFile(resourcesDir + imageFile +"-grayscale-perceptual.ppm", ppmExample.getGrayscaleMatrix("perceptual"));
 	ppmExample.printImageToFile(resourcesDir + imageFile +"-grayscale-luma.ppm", ppmExample.getGrayscaleMatrix("luma"));
 	ppmExample.printImageToFile(resourcesDir + imageFile +"-red-filter.ppm", ppmExample.getFilteredMatrix());

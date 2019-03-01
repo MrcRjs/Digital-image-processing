@@ -213,24 +213,26 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 				push binaryColor to binaryPixel
 			push binaryPixel to binaryMatrix
 	*/
-	int matrixSize = matrix.size();
-	int channels = matrix[0].size(); 
+	auto grayMatrix = getGrayscaleMatrix("perceptual");
+	int matrixSize = grayMatrix.size();
+	int channels = grayMatrix[0].size(); 
 
 	vector <vector<unsigned short int>> binaryMatrix;
 	
-	// For every pixel p in image matrix
+	// For every pixel p in image grayMatrix
 	for (int p = 0; p < matrixSize; p++)
 	{
 		vector <unsigned short int> binaryPixel;
 		
 		// For every channel c in each pixel
-		for (int c = 0; c < channels; c++)
-		{
-			unsigned short int newCol = matrix[p][c] >= limit ? colorDepth : 0;
+		unsigned short int newCol = grayMatrix[p][0] >= limit ? colorDepth : 0;
 
-			// Push binary color to inverted pixel
+		// Push binary color to inverted pixel
+		for (int i = 0; i < 3; i++)
+		{
 			binaryPixel.push_back(newCol);
 		}
+
 		// Push binary pixel to inverted matrix
 		binaryMatrix.push_back(binaryPixel);
 	}
