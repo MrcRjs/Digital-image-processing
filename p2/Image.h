@@ -23,6 +23,8 @@ class Image
 		vector <vector <unsigned short int>> getDataMatrix(void);
 		vector <vector <unsigned short int>> getInvertedColorMatrix(void);
 		vector <vector <unsigned short int>> getBinaryMatrix(int);
+		vector <vector <unsigned short int>> getBinaryUmbralMatrix(int, int);
+		vector <vector <unsigned short int>> getBinaryUmbralInvertedMatrix(int, int);
 		vector <vector <unsigned short int>> getGrayscaleMatrix(string);
 		vector <vector <unsigned short int>> getFilteredMatrix(void);
 		vector <unsigned int> getImageHistogram(unsigned short int, vector <vector <unsigned short int>>);

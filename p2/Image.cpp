@@ -217,13 +217,9 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 	
 	// For every pixel p in image grayMatrix
 	for (int p = 0; p < matrixSize; p++)
-	{
-		vector <unsigned short int> binaryPixel;
-		
-		// For every channel c in each pixel
-		unsigned short int newCol = grayMatrix[p][0] >= limit ? colorDepth : 0;
+	{		
+		unsigned short int newCol = grayMatrix[p][0] >= limit ? colorDepth - 1 : 0;
 
-		// Push binary color to inverted pixel
 		for (int c = 0; c < channels; c++)
 		{
 			binaryMatrix[p][c] = newCol;
@@ -231,6 +227,63 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 	}
 
 	return binaryMatrix;
+}
+
+vector <vector <unsigned short int>> Image::getBinaryUmbralMatrix(int lowerLimit, int upperLimit)
+{
+	/* Binary Algorithm
+		For each pixel p in matrix:
+			For each channel c in pixel:
+				binaryColor = if c is >=  than treshold, c = 1 else = 0 
+				push binaryColor to binaryPixel
+			push binaryPixel to binaryMatrix
+	*/
+	const auto grayMatrix = getGrayscaleMatrix("perceptual");
+	const int matrixSize = grayMatrix.size();
+	const unsigned short int channels = 3; 
+
+	vector <vector<unsigned short int>> binaryUmbralMatrix(matrixSize, vector <unsigned short int>(channels, 0));
+	
+	// For every pixel p in image grayMatrix
+	for (int p = 0; p < matrixSize; p++)
+	{	
+		unsigned short int newCol = grayMatrix[p][0] >= lowerLimit && grayMatrix[p][0] <= upperLimit  ? colorDepth - 1 : 0;
+
+		for (int c = 0; c < channels; c++)
+		{
+			binaryUmbralMatrix[p][c] = newCol;
+		}
+	}
+
+	return binaryUmbralMatrix;
+}
+
+vector <vector <unsigned short int>> Image::getBinaryUmbralInvertedMatrix(int lowerLimit, int upperLimit)
+{
+	/* Binary Algorithm
+		For each pixel p in matrix:
+			For each channel c in pixel:
+				binaryColor = if c is >=  than treshold, c = 1 else = 0 
+				push binaryColor to binaryPixel
+			push binaryPixel to binaryMatrix
+	*/
+	const auto grayMatrix = getGrayscaleMatrix("perceptual");
+	const int matrixSize = grayMatrix.size();
+	const unsigned short int channels = 3; 
+
+	vector <vector<unsigned short int>> binaryUmbralInvertedMatrix(matrixSize, vector <unsigned short int>(channels, 0));
+	
+	// For every pixel p in image grayMatrix
+	for (int p = 0; p < matrixSize; p++)
+	{
+		unsigned short int newCol = grayMatrix[p][0] >= lowerLimit && grayMatrix[p][0] <= upperLimit  ? 0 : colorDepth - 1;
+		for (int c = 0; c < channels; c++)
+		{
+			binaryUmbralInvertedMatrix[p][c] = newCol;
+		}
+	}
+
+	return binaryUmbralInvertedMatrix;
 }
 
 vector <vector <unsigned short int>> Image::getFilteredMatrix(void)
