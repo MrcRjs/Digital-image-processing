@@ -1,6 +1,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 #include <iostream>
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -23,7 +25,11 @@ class Image
 		vector <vector <unsigned short int>> getBinaryMatrix(int);
 		vector <vector <unsigned short int>> getGrayscaleMatrix(string);
 		vector <vector <unsigned short int>> getFilteredMatrix(void);
+		vector <unsigned int> getImageHistogram(unsigned short int, vector <vector <unsigned short int>>);
+		vector <vector <unsigned short int>> getGammaCorrectedMatrix(float);
+		vector <vector <unsigned short int>> getGammaCorrectedGrayscaleMatrix(float);
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
+		void printHistogramToFile(string, vector <unsigned int>);
 
 	private:
 		fstream ppmImage;

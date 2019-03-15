@@ -146,7 +146,7 @@ void Image::readImage(string file)
 			height = stoi(line.substr(delimIdx, line.length()), nullptr, 0);
 
 			line = getNextLine();
-			colorDepth = stoi(line);
+			colorDepth = stoi(line) + 1;
 
 			// After processing headers we populate the image matrix data
 			populateMatrix();
@@ -176,16 +176,14 @@ vector <vector <unsigned short int>> Image::getInvertedColorMatrix(void)
 				push invertedColor to invertedPixel
 			push invertedPixel to invertedMatrix
 	*/
-	int matrixSize = matrix.size();
-	int channels = matrix[0].size(); 
+	const int matrixSize = matrix.size();
+	const int channels = matrix[0].size(); 
 
-	vector <vector<unsigned short int>> invDataMatrix;
+	vector <vector <unsigned short int>> invDataMatrix(matrixSize, vector <unsigned short int>(channels, 0));
 	
 	// For every pixel p in image matrix
 	for (int p = 0; p < matrixSize; p++)
 	{
-		vector <unsigned short int> invPixel;
-		
 		// For every channel c in each pixel
 		for (int c = 0; c < channels; c++)
 		{
@@ -195,10 +193,8 @@ vector <vector <unsigned short int>> Image::getInvertedColorMatrix(void)
 			unsigned short int newCol = colorDepth - matrix[p][c];
 
 			// Push inverted color to inverted pixel
-			invPixel.push_back(newCol);
+			invDataMatrix[p][c] = newCol;
 		}
-		// Push inverted pixel to inverted matrix
-		invDataMatrix.push_back(invPixel);
 	}
 
 	return invDataMatrix;
@@ -213,11 +209,11 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 				push binaryColor to binaryPixel
 			push binaryPixel to binaryMatrix
 	*/
-	auto grayMatrix = getGrayscaleMatrix("perceptual");
-	int matrixSize = grayMatrix.size();
-	int channels = grayMatrix[0].size(); 
+	const auto grayMatrix = getGrayscaleMatrix("perceptual");
+	const int matrixSize = grayMatrix.size();
+	const unsigned short int channels = 3; 
 
-	vector <vector<unsigned short int>> binaryMatrix;
+	vector <vector<unsigned short int>> binaryMatrix(matrixSize, vector <unsigned short int>(channels, 0));
 	
 	// For every pixel p in image grayMatrix
 	for (int p = 0; p < matrixSize; p++)
@@ -228,13 +224,10 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 		unsigned short int newCol = grayMatrix[p][0] >= limit ? colorDepth : 0;
 
 		// Push binary color to inverted pixel
-		for (int i = 0; i < 3; i++)
+		for (int c = 0; c < channels; c++)
 		{
-			binaryPixel.push_back(newCol);
+			binaryMatrix[p][c] = newCol;
 		}
-
-		// Push binary pixel to inverted matrix
-		binaryMatrix.push_back(binaryPixel);
 	}
 
 	return binaryMatrix;
@@ -242,24 +235,19 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 
 vector <vector <unsigned short int>> Image::getFilteredMatrix(void)
 {
-	auto grayMat = getGrayscaleMatrix("perceptual");
+	const auto grayMat = getGrayscaleMatrix("perceptual");
+	const int matrixSize = grayMat.size();
+	const unsigned short int channels = 3;
 
-	int matrixSize = grayMat.size(); 
-
-	vector <vector<unsigned short int>> filteredMatrix;
+	vector <vector<unsigned short int>> filteredMatrix(matrixSize, vector <unsigned short int>(channels, 0));;
 	
 	// For every pixel p in image matrix
 	for (int p = 0; p < matrixSize; p++)
 	{
-		vector <unsigned short int> pixel;
+		vector <unsigned short int> pixel(3, 0);
 
-		//pixel.push_back(0);
-		//pixel.push_back(0);
-		pixel.push_back(grayMat[p][0]);
-		//pixel.push_back(grayMat[p][0]);
-		pixel.push_back(0);
-		pixel.push_back(0);
-		filteredMatrix.push_back(pixel);
+		pixel[0] = grayMat[p][0];
+		filteredMatrix[p] = pixel;
 	}
 	return filteredMatrix;
 };
@@ -269,22 +257,20 @@ vector <vector <unsigned short int>> Image::getGrayscaleMatrix(string type = "pe
 	/* Grayscale Algorithm
 		For each pixel p in matrix:
 			grayscalePixel = 0.2126 * r + 0.7512 * g + 0.0722 * b
-			push grayscalePixel to grayscaleMatrix
+			push grayscalePixel to grayScaleMatrix
 	*/
 
-	int matrixSize = matrix.size();
-	int channels = matrix[0].size(); 
+	const int matrixSize = matrix.size();
+	const unsigned short int channels = 3; 
 
-	vector <vector<unsigned short int>> grayScaleMatrix;
+	vector <vector<unsigned short int>> grayScaleMatrix(matrixSize, vector <unsigned short int>(channels, 0));;
 	
 	// For every pixel p in image matrix
 	for (int p = 0; p < matrixSize; p++)
 	{
-		vector <unsigned short int> grayscalePixel;
-		
-		unsigned short int r = matrix[p][0];
-		unsigned short int g = matrix[p][1];
-		unsigned short int b = matrix[p][2];
+		const unsigned short int r = matrix[p][0];
+		const unsigned short int g = matrix[p][1];
+		const unsigned short int b = matrix[p][2];
 
 		unsigned short int grayPixelColor;
 
@@ -304,13 +290,125 @@ vector <vector <unsigned short int>> Image::getGrayscaleMatrix(string type = "pe
 		// For every channel c in each pixel
 		for (int c = 0; c < channels; c++)
 		{
-			grayscalePixel.push_back(grayPixelColor);
+			grayScaleMatrix[p][c] = grayPixelColor;
 		}
-		// Push binary pixel to inverted matrix
-		grayScaleMatrix.push_back(grayscalePixel);
 	}
 
 	return grayScaleMatrix;
+}
+
+vector <unsigned int> Image::getImageHistogram(unsigned short int c = 0, vector <vector <unsigned short int>> imageMatrix = vector <vector <unsigned short int>>()) {
+	// Construct vector with colorDepth elements started in 0
+	vector <unsigned int> histVals(colorDepth, 0);
+
+	const int totalPixels = imageMatrix.size();
+
+	// For every pixel in image add 1 to correspondig histogram value
+	for (int i = 0; i < totalPixels; ++i)
+	{
+		histVals[imageMatrix[i][c]]++;
+	}
+
+	return histVals;
+}
+
+vector <vector <unsigned short int>> Image::getGammaCorrectedGrayscaleMatrix(float gamma)
+{
+	const auto grayScaleMatrix = getGrayscaleMatrix("luma");
+	const int totalPixels = grayScaleMatrix.size();
+
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> gammaCorrectedMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+
+	// For each pixel set the gamma corrected color
+	for (int i = 0; i < totalPixels; ++i)
+	{
+		float gammaCorrectedColor = colorDepth * pow((grayScaleMatrix[i][0] / float(colorDepth)), gamma);
+		gammaCorrectedMatrix[i][0] = int(gammaCorrectedColor);
+		gammaCorrectedMatrix[i][1] = int(gammaCorrectedColor);
+		gammaCorrectedMatrix[i][2] = int(gammaCorrectedColor);
+	}
+	return gammaCorrectedMatrix;
+}
+
+vector <vector <unsigned short int>> Image::getGammaCorrectedMatrix(float gamma)
+{
+	const auto originalMatrix = matrix;
+	const int totalPixels = originalMatrix.size();
+
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> gammaCorrectedMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+
+	// For each pixel set the gamma corrected color
+	for (int i = 0; i < totalPixels; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			const float gammaCorrectedColor = colorDepth * pow((originalMatrix[i][j] / float(colorDepth)), gamma);
+			gammaCorrectedMatrix[i][j] = int(gammaCorrectedColor);
+		}
+	}
+	return gammaCorrectedMatrix;
+}
+
+
+void Image::printHistogramToFile(string path = "", vector <unsigned int> histogramMatrix =  vector <unsigned int>())
+{
+		// Verify valid path is provided
+	if (path != "")
+	{
+		ofstream histFile(path);
+		
+		if (histFile)
+		{
+			// Set Headers
+			// Get max value in histogram to set image width
+			// https://stackoverflow.com/a/9874912/3011836
+			const int maxVal = *max_element(histogramMatrix.begin(), histogramMatrix.end());
+			// Note that in P1 format, a 0 signifies a white pixel, and a 1 signifies a black pixel
+			histFile << "P1" << endl;
+
+			const int heightScale = maxVal / colorDepth;
+			histFile << maxVal << " " << colorDepth * heightScale << endl;
+			const int histTotalcolors = histogramMatrix.size();
+
+			for (int i = 0; i < histTotalcolors; ++i)
+			 {
+			 	for (int j = 0; j < heightScale; ++j)
+			 	{
+			 		// For current color print n WHITE pixels
+				 	const int currentVal = histogramMatrix[i];
+				 	for (int i = 0; i < currentVal; ++i)
+				 	{
+				 		histFile << 0 << " ";
+				 	}
+				 	// For max histogram value - current histogram value print BLACK pixels
+				 	const int whiteDelta = maxVal - currentVal;
+				 	for (int i = 0; i < whiteDelta; ++i)
+				 	{
+				 		histFile << 1 << " ";
+				 	}
+				 	histFile << endl;
+			 	}
+			 } 
+
+			histFile.close();	
+		}
+		else
+		{
+			// Throw err
+			cout << "Error opening file " << path;
+		}
+	}
+	else 
+	{
+		cout << "Error invalid path provided" << endl;
+	}
+
 }
 
 void Image::printImageToFile(string path = "", vector <vector <unsigned short int>> img =  vector <vector <unsigned short int>>())
@@ -330,8 +428,8 @@ void Image::printImageToFile(string path = "", vector <vector <unsigned short in
 			newImg << width << " " << height << endl;
 			newImg << colorDepth << endl;
 			
-			int matrixSize = img.size();
-			int channels = img[0].size();
+			const int matrixSize = img.size();
+			const unsigned short int channels = 3;
 
 			for (int p = 0; p < matrixSize; ++p)
 			{
