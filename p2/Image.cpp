@@ -200,14 +200,13 @@ vector <vector <unsigned short int>> Image::getInvertedColorMatrix(void)
 	return invDataMatrix;
 }
 
-vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
+vector <vector <unsigned short int>> Image::getBinaryMatrix(int treshold)
 {
 	/* Binary Algorithm
 		For each pixel p in matrix:
 			For each channel c in pixel:
 				binaryColor = if c is >=  than treshold, c = 1 else = 0 
-				push binaryColor to binaryPixel
-			push binaryPixel to binaryMatrix
+				set binaryColor
 	*/
 	const auto grayMatrix = getGrayscaleMatrix("perceptual");
 	const int matrixSize = grayMatrix.size();
@@ -218,7 +217,7 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 	// For every pixel p in image grayMatrix
 	for (int p = 0; p < matrixSize; p++)
 	{		
-		unsigned short int newCol = grayMatrix[p][0] >= limit ? colorDepth - 1 : 0;
+		unsigned short int newCol = grayMatrix[p][0] >= treshold ? colorDepth - 1 : 0;
 
 		for (int c = 0; c < channels; c++)
 		{
@@ -231,16 +230,15 @@ vector <vector <unsigned short int>> Image::getBinaryMatrix(int limit)
 
 vector <vector <unsigned short int>> Image::getBinaryUmbralMatrix(int lowerLimit, int upperLimit)
 {
-	/* Binary Algorithm
+	/* Binary Umbral Algorithm
 		For each pixel p in matrix:
 			For each channel c in pixel:
-				binaryColor = if c is >=  than treshold, c = 1 else = 0 
-				push binaryColor to binaryPixel
-			push binaryPixel to binaryMatrix
+				binaryUmbralColor = if c is >=  than lowerLimit AND c <= upperLimit, c = MaxPossibleColor else = 0 
+				set binaryUmbralColor
 	*/
 	const auto grayMatrix = getGrayscaleMatrix("perceptual");
 	const int matrixSize = grayMatrix.size();
-	const unsigned short int channels = 3; 
+	const unsigned short int channels = 3;
 
 	vector <vector<unsigned short int>> binaryUmbralMatrix(matrixSize, vector <unsigned short int>(channels, 0));
 	
@@ -260,12 +258,11 @@ vector <vector <unsigned short int>> Image::getBinaryUmbralMatrix(int lowerLimit
 
 vector <vector <unsigned short int>> Image::getBinaryUmbralInvertedMatrix(int lowerLimit, int upperLimit)
 {
-	/* Binary Algorithm
+	/* Binary Umbral Inverted Algorithm
 		For each pixel p in matrix:
 			For each channel c in pixel:
-				binaryColor = if c is >=  than treshold, c = 1 else = 0 
-				push binaryColor to binaryPixel
-			push binaryPixel to binaryMatrix
+				binaryUmbralInvertedColor = if c is >=  than lowerLimit AND c <= upperLimit, c = 0 else = MaxPossibleColor 
+				set binaryUmbralInvertedColor
 	*/
 	const auto grayMatrix = getGrayscaleMatrix("perceptual");
 	const int matrixSize = grayMatrix.size();
@@ -304,6 +301,26 @@ vector <vector <unsigned short int>> Image::getFilteredMatrix(void)
 	}
 	return filteredMatrix;
 };
+
+vector <vector <unsigned short int>> Image::getSumImages(vector <vector <unsigned short int>> imgA, vector <vector <unsigned short int>> imgB)
+{
+	const int totalPixels = imgA.size();
+
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> sumMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+	// For each pixel set the gamma corrected color
+	for (int i = 0; i < totalPixels; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			sumMatrix[i][j] = int(((imgA[i][j] + imgB[i][j]) / 2));
+		}
+	}
+	return sumMatrix;
+}
+
 
 vector <vector <unsigned short int>> Image::getGrayscaleMatrix(string type = "perceptual")
 {
