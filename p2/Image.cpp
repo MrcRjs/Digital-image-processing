@@ -382,41 +382,62 @@ vector <vector <unsigned short int>> Image::getGrayscaleMatrix(string type = "pe
 			push grayscalePixel to grayScaleMatrix
 	*/
 
-	const int matrixSize = matrix.size();
-	const unsigned short int channels = 3; 
-
-	vector <vector<unsigned short int>> grayScaleMatrix(matrixSize, vector <unsigned short int>(channels, 0));;
-	
-	// For every pixel p in image matrix
-	for (int p = 0; p < matrixSize; p++)
+	if (type == "perceptual" && grayScalePerceptualMatrix.size() > 0)
 	{
-		const unsigned short int r = matrix[p][0];
-		const unsigned short int g = matrix[p][1];
-		const unsigned short int b = matrix[p][2];
-
-		unsigned short int grayPixelColor;
-
-		if (type == "perceptual")
-		{
-			// Colorimetric (perceptual luminance-preserving)
-			// https://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
-			grayPixelColor = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
-		} else if (type == "luma"){
-			// Luma
-			grayPixelColor = (0.299 * r) + (0.587 * g) + (0.114 * b);
-		} else {
-			// Use perceptual as
-			grayPixelColor = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
-		}
-
-		// For every channel c in each pixel
-		for (int c = 0; c < channels; c++)
-		{
-			grayScaleMatrix[p][c] = grayPixelColor;
-		}
+		return grayScalePerceptualMatrix;
 	}
+	else if(type == "luma" && grayScaleLumaMatrix.size() > 0)
+	{
+		return grayScaleLumaMatrix;
+	}
+	else
+	{
+		const int matrixSize = matrix.size();
+		const unsigned short int channels = 3; 
 
-	return grayScaleMatrix;
+		vector <vector<unsigned short int>> grayScaleMatrix(matrixSize, vector <unsigned short int>(channels, 0));;
+		
+		// For every pixel p in image matrix
+		for (int p = 0; p < matrixSize; p++)
+		{
+			const unsigned short int r = matrix[p][0];
+			const unsigned short int g = matrix[p][1];
+			const unsigned short int b = matrix[p][2];
+
+			unsigned short int grayPixelColor;
+
+			if (type == "perceptual")
+			{
+				// Colorimetric (perceptual luminance-preserving)
+				// https://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
+				grayPixelColor = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+			} else if (type == "luma"){
+				// Luma
+				grayPixelColor = (0.299 * r) + (0.587 * g) + (0.114 * b);
+			} else {
+				// Use perceptual as
+				grayPixelColor = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+			}
+
+			// For every channel c in each pixel
+			for (int c = 0; c < channels; c++)
+			{
+				grayScaleMatrix[p][c] = grayPixelColor;
+			}
+		}
+
+		// Save gray matrix to object matrix
+		if (type == "luma")
+		{
+			grayScaleLumaMatrix = grayScaleMatrix;
+		}
+		else
+		{
+			grayScalePerceptualMatrix = grayScaleMatrix;
+		}
+
+		return grayScaleMatrix;
+	}
 }
 
 vector <unsigned int> Image::getImageHistogram(unsigned short int c = 0, vector <vector <unsigned short int>> imageMatrix = vector <vector <unsigned short int>>()) {

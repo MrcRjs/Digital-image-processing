@@ -45,6 +45,8 @@ class Image
 		// unsigned short integer for up to 65536 colors  
 		vector <vector <unsigned short int>> matrix;
 		vector <vector <unsigned short int>> invertedColorMatrix;
+		vector <vector <unsigned short int>> grayScalePerceptualMatrix;
+		vector <vector <unsigned short int>> grayScaleLumaMatrix;
 		bool lineIsComment(string);
 		void printComments(string *);
 		string getNextLine(void);
