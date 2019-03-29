@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-binary.ppm", ppmExample.getBinaryMatrix(100));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-grayscale-perceptual.ppm", ppmExample.getGrayscaleMatrix("perceptual"));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-grayscale-luma.ppm", ppmExample.getGrayscaleMatrix("luma"));
-	//ppmExample.printImageToFile(resourcesDir + imageFile + "-red-filter.ppm", ppmExample.getFilteredMatrix());
+	//ppmExample.printImageToFile(resourcesDir + imageFile + "-red-filter.ppm", ppmExample.getFilteredMatrix(1,0,0));
 	//ppmExample.printHistogramToFile(resourcesDir + imageFile + "-histogram.ppm", ppmExample.getImageHistogram(0, ppmExample.getGrayscaleMatrix("luma")));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-gamma-grayscale.ppm", ppmExample.getGammaCorrectedGrayscaleMatrix(0.25));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-gamma.ppm", ppmExample.getGammaCorrectedMatrix(2));

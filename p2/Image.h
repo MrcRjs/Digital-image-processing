@@ -26,7 +26,7 @@ class Image
 		vector <vector <unsigned short int>> getBinaryUmbralMatrix(int, int);
 		vector <vector <unsigned short int>> getBinaryUmbralInvertedMatrix(int, int);
 		vector <vector <unsigned short int>> getGrayscaleMatrix(string);
-		vector <vector <unsigned short int>> getFilteredMatrix(void);
+		vector <vector <unsigned short int>> getFilteredMatrix(bool, bool, bool);
 		vector <unsigned int> getImageHistogram(unsigned short int, vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getGammaCorrectedMatrix(float);
 		vector <vector <unsigned short int>> getSumMatrix(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);

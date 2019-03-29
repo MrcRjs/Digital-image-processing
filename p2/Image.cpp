@@ -311,7 +311,7 @@ vector <vector <unsigned short int>> Image::getBinaryUmbralInvertedMatrix(int lo
 	return binaryUmbralInvertedMatrix;
 }
 
-vector <vector <unsigned short int>> Image::getFilteredMatrix(void)
+vector <vector <unsigned short int>> Image::getFilteredMatrix(bool r = 1, bool g = 0, bool b = 0 )
 {
 	const auto grayMat = getGrayscaleMatrix("perceptual");
 	const int matrixSize = grayMat.size();
@@ -322,10 +322,9 @@ vector <vector <unsigned short int>> Image::getFilteredMatrix(void)
 	// For every pixel p in image matrix
 	for (int p = 0; p < matrixSize; p++)
 	{
-		vector <unsigned short int> pixel(3, 0);
-
-		pixel[0] = grayMat[p][0];
-		filteredMatrix[p] = pixel;
+		filteredMatrix[p][0] = r ? grayMat[p][0] : 0;
+		filteredMatrix[p][1] = g ? grayMat[p][1] : 0;
+		filteredMatrix[p][2] = b ? grayMat[p][2] : 0;
 	}
 	return filteredMatrix;
 };
