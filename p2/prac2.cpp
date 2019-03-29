@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-binary-umbral.ppm", ppmExample.getBinaryUmbralMatrix(50, 180));
 	ppmExample.printImageToFile(resourcesDir + imageFile + "-extension-umbral.ppm", ppmExample.getExtensionUmbralMatrix(50, 180));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-binary-umbral-inverted.ppm", ppmExample.getBinaryUmbralInvertedMatrix(50, 180));
-	ppmExample.printImageToFile(resourcesDir + imageFile + "-summed.ppm", ppmExample.getSumImages(ppmExample.getFilteredMatrix(), ppmExample.getInvertedColorMatrix()));
-	ppmExample.printImageToFile(resourcesDir + imageFile + "-summedGray.ppm", ppmExample.getSumImages(ppmExample.getBinaryUmbralMatrix(50,180), ppmExample.getBinaryUmbralInvertedMatrix(50,180)));
+	//ppmExample.printImageToFile(resourcesDir + imageFile + "-summed.ppm", ppmExample.getSumMatrix(ppmExample.getFilteredMatrix(), ppmExample.getInvertedColorMatrix()));
+	ppmExample.printImageToFile(resourcesDir + imageFile + "-subst.ppm", ppmExample.getSubstMatrix(ppmExample.getDataMatrix(), ppmExample.getExtensionUmbralMatrix(50, 180)));
 	return 0;
 }

@@ -330,7 +330,7 @@ vector <vector <unsigned short int>> Image::getFilteredMatrix(void)
 	return filteredMatrix;
 };
 
-vector <vector <unsigned short int>> Image::getSumImages(vector <vector <unsigned short int>> imgA, vector <vector <unsigned short int>> imgB)
+vector <vector <unsigned short int>> Image::getSumMatrix(vector <vector <unsigned short int>> imgA, vector <vector <unsigned short int>> imgB)
 {
 	const int totalPixels = imgA.size();
 
@@ -338,7 +338,7 @@ vector <vector <unsigned short int>> Image::getSumImages(vector <vector <unsigne
 	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
 	vector <vector <unsigned short int>> sumMatrix(totalPixels, vector <unsigned short int> (3, 0));
 
-	// For each pixel set the gamma corrected color
+	// For each pixel set the sum (imgAPixel + imgBPixel) / 2
 	for (int i = 0; i < totalPixels; ++i)
 	{
 		for (int j = 0; j < 3; ++j)
@@ -349,6 +349,24 @@ vector <vector <unsigned short int>> Image::getSumImages(vector <vector <unsigne
 	return sumMatrix;
 }
 
+vector <vector <unsigned short int>> Image::getSubstMatrix(vector <vector <unsigned short int>> imgA, vector <vector <unsigned short int>> imgB)
+{
+	const int totalPixels = imgA.size();
+
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> subsMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+	// For each pixel set substraction Absolute |imgAPixel - imgBPixel|
+	for (int i = 0; i < totalPixels; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			subsMatrix[i][j] = fabs(((imgA[i][j] - imgB[i][j])));
+		}
+	}
+	return subsMatrix;
+}
 
 vector <vector <unsigned short int>> Image::getGrayscaleMatrix(string type = "perceptual")
 {

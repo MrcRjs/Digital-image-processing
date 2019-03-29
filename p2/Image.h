@@ -29,7 +29,8 @@ class Image
 		vector <vector <unsigned short int>> getFilteredMatrix(void);
 		vector <unsigned int> getImageHistogram(unsigned short int, vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getGammaCorrectedMatrix(float);
-		vector <vector <unsigned short int>> getSumImages(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);
+		vector <vector <unsigned short int>> getSumMatrix(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);
+		vector <vector <unsigned short int>> getSubstMatrix(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getGammaCorrectedGrayscaleMatrix(float);
 		vector <vector <unsigned short int>> getExtensionUmbralMatrix(int lowerLimit, int upperLimit);
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
