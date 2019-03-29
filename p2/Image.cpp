@@ -273,7 +273,7 @@ vector <vector <unsigned short int>> Image::getExtensionUmbralMatrix(int lowerLi
 	// For every pixel p in image grayMatrix
 	for (int p = 0; p < matrixSize; p++)
 	{	
-		unsigned short int newCol = grayMatrix[p][0] >= lowerLimit && grayMatrix[p][0] <= upperLimit  ? colorDepth - 1 : (grayMatrix[p][0] - lowerLimit) * ((colorDepth - 1) / upperLimit - lowerLimit );
+		unsigned short int newCol = grayMatrix[p][0] >= lowerLimit && grayMatrix[p][0] <= upperLimit  ? (grayMatrix[p][0] - lowerLimit) * ((colorDepth - 1) / (upperLimit - lowerLimit)) : colorDepth - 1;
 
 		for (int c = 0; c < channels; c++)
 		{

@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
 	// g++ -o p2 prac2.cpp Image.cpp
 	Image ppmExample;
 	string resourcesDir = "../res/";
-	string imageFile = "panda";
+	string imageFile = "lenna";
 	ppmExample.readImage(resourcesDir + imageFile + ".ppm");
 	// Simplified using constructor
 	// Image ppmExample = new Image("../res/imagen2.ppm");
@@ -27,7 +27,7 @@ int main(int argc, char const *argv[])
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-gamma-grayscale.ppm", ppmExample.getGammaCorrectedGrayscaleMatrix(0.25));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-gamma.ppm", ppmExample.getGammaCorrectedMatrix(2));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-binary-umbral.ppm", ppmExample.getBinaryUmbralMatrix(50, 180));
-	ppmExample.printImageToFile(resourcesDir + imageFile + "-extension-umbral.ppm", ppmExample.getExtensionUmbralMatrix(50, 250));
+	ppmExample.printImageToFile(resourcesDir + imageFile + "-extension-umbral.ppm", ppmExample.getExtensionUmbralMatrix(50, 180));
 	//ppmExample.printImageToFile(resourcesDir + imageFile + "-binary-umbral-inverted.ppm", ppmExample.getBinaryUmbralInvertedMatrix(50, 180));
 	ppmExample.printImageToFile(resourcesDir + imageFile + "-summed.ppm", ppmExample.getSumImages(ppmExample.getFilteredMatrix(), ppmExample.getInvertedColorMatrix()));
 	ppmExample.printImageToFile(resourcesDir + imageFile + "-summedGray.ppm", ppmExample.getSumImages(ppmExample.getBinaryUmbralMatrix(50,180), ppmExample.getBinaryUmbralInvertedMatrix(50,180)));
