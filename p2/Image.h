@@ -44,6 +44,7 @@ class Image
 		int colorDepth = 0;
 		// unsigned short integer for up to 65536 colors  
 		vector <vector <unsigned short int>> matrix;
+		vector <vector <unsigned short int>> invertedColorMatrix;
 		bool lineIsComment(string);
 		void printComments(string *);
 		string getNextLine(void);

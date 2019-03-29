@@ -176,28 +176,35 @@ vector <vector <unsigned short int>> Image::getInvertedColorMatrix(void)
 				push invertedColor to invertedPixel
 			push invertedPixel to invertedMatrix
 	*/
-	const int matrixSize = matrix.size();
-	const int channels = matrix[0].size(); 
-
-	vector <vector <unsigned short int>> invDataMatrix(matrixSize, vector <unsigned short int>(channels, 0));
-	
-	// For every pixel p in image matrix
-	for (int p = 0; p < matrixSize; p++)
+	if (invertedColorMatrix.size() > 0)
 	{
-		// For every channel c in each pixel
-		for (int c = 0; c < channels; c++)
-		{
-			// Process inverted value
-			// COLOR DEPTH SHOULD BE MAX POSIBLE VALUE FOR EACH VALUE
-			// https://en.wikipedia.org/wiki/Netpbm_format
-			unsigned short int newCol = colorDepth - matrix[p][c];
-
-			// Push inverted color to inverted pixel
-			invDataMatrix[p][c] = newCol;
-		}
+		return invertedColorMatrix;
 	}
+	else
+	{
+		const int matrixSize = matrix.size();
+		const int channels = matrix[0].size(); 
 
-	return invDataMatrix;
+		vector <vector <unsigned short int>> invDataMatrix(matrixSize, vector <unsigned short int>(channels, 0));
+		
+		// For every pixel p in image matrix
+		for (int p = 0; p < matrixSize; p++)
+		{
+			// For every channel c in each pixel
+			for (int c = 0; c < channels; c++)
+			{
+				// Process inverted value
+				// COLOR DEPTH SHOULD BE MAX POSIBLE VALUE FOR EACH VALUE
+				// https://en.wikipedia.org/wiki/Netpbm_format
+				unsigned short int newCol = colorDepth - matrix[p][c];
+
+				// Push inverted color to inverted pixel
+				invDataMatrix[p][c] = newCol;
+			}
+		}
+
+		return invDataMatrix;
+	}
 }
 
 vector <vector <unsigned short int>> Image::getBinaryMatrix(int treshold)
