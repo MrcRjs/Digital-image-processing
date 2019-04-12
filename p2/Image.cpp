@@ -1,4 +1,4 @@
-#include "Image.h"
+#include "Image.hpp"
 
 /*
 	Private helpers
@@ -196,7 +196,7 @@ vector <vector <unsigned short int>> Image::getInvertedColorMatrix(void)
 				// Process inverted value
 				// COLOR DEPTH SHOULD BE MAX POSIBLE VALUE FOR EACH VALUE
 				// https://en.wikipedia.org/wiki/Netpbm_format
-				unsigned short int newCol = colorDepth - matrix[p][c];
+				unsigned short int newCol = colorDepth - 1 - matrix[p][c];
 
 				// Push inverted color to inverted pixel
 				invDataMatrix[p][c] = newCol;
@@ -368,7 +368,7 @@ vector <vector <unsigned short int>> Image::getSubstMatrix(vector <vector <unsig
 	{
 		for (int j = 0; j < 3; ++j)
 		{
-			subsMatrix[i][j] = fabs(((imgA[i][j] - imgB[i][j])));
+			subsMatrix[i][j] = fabs((imgA[i][j] - imgB[i][j])*2);
 		}
 	}
 	return subsMatrix;
@@ -498,6 +498,176 @@ vector <vector <unsigned short int>> Image::getGammaCorrectedMatrix(float gamma)
 	return gammaCorrectedMatrix;
 }
 
+vector <vector <unsigned short int>> Image::getLogaritmicMatrix(int alpha = 1)
+{
+	const auto originalMatrix = matrix;
+	const int totalPixels = originalMatrix.size();
+
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> logaritmicMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+	if (alpha < 1)
+	{
+		alpha = 1;
+	}
+	const int A = abs((colorDepth - 1) / float (log(alpha * colorDepth)));
+
+	// For each pixel set the logaritmic color
+	for (int i = 0; i < totalPixels; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			logaritmicMatrix[i][j] = A * log((alpha * originalMatrix[i][j]) + 1);
+		}
+	}
+	return logaritmicMatrix;
+}
+
+vector <vector <unsigned short int>> Image::getSinMatrix(void)
+{
+	const auto originalMatrix = matrix;
+	const int totalPixels = originalMatrix.size();
+
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> sinMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+
+
+	// For each pixel set sin color
+	for (int i = 0; i < totalPixels; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			if (originalMatrix[i][j] == 255)
+			{
+				sinMatrix[i][j] = 255;
+			}
+			else 
+			{
+				sinMatrix[i][j] = (colorDepth - 1) * sin((M_PI * originalMatrix[i][j]) / (2 * (colorDepth - 1)));
+			}
+		}
+	}
+	return sinMatrix;
+}
+
+vector <vector <unsigned short int>> Image::getBordersMatrix()
+{
+	const auto grayScaleMatrix = getGrayscaleMatrix("luma");
+	const int totalPixels = grayScaleMatrix.size();
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> bordersMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+
+	for (int i = 0; i < height - 1; ++i)
+	{
+		for (int j = 0; j < width - 1; ++j)
+		{
+			// Calculate first derivates x and y
+			const int resx = grayScaleMatrix[getVectorIndex(i + 1, j)][0] -  grayScaleMatrix[getVectorIndex(i, j)][0];
+			const int resy = grayScaleMatrix[getVectorIndex(i, j + 1)][0] -  grayScaleMatrix[getVectorIndex(i, j)][0];
+
+			// Get 
+			const int resSum = sqrt((resx * resx) + (resy * resy));
+			
+			// Assign result to border matrix
+			const int curPix = getVectorIndex(i, j);
+			for (int k = 0; k < 3; ++k)
+			{
+				bordersMatrix[curPix][k] = resSum;
+			}
+		}
+	}
+	return bordersMatrix;
+};
+
+vector <vector <unsigned short int>> Image::getBordersGradMatrix()
+{
+	// Using Sobel operator
+	// https://en.wikipedia.org/wiki/Sobel_operator
+	const auto grayScaleMatrix = getGrayscaleMatrix("luma");
+	const int totalPixels = grayScaleMatrix.size();
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> bordersMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+	const short int gradx[3][3] = {
+		{ -1, 0, 1 },
+		{ -2, 0, 2 },
+		{ -1, 0, 1 },
+	};
+
+	const short int grady[3][3] = { 
+		{ -1, -2, -1 },
+		{ 0, 0, 0 },
+		{ 1, 2, 1 },
+	};
+
+/*
+
+	const short int gradx[3][3] = {
+		{ -1, -1, -1 },
+		{ -1, 8, -1 },
+		{ -1, -1, -1 },
+	};
+
+
+	const short int grady[3][3] = {
+		{ -1, -1, -1 },
+		{ -1, 8, -1 },
+		{ -1, -1, -1 },
+	};
+*/
+	for (int i = 1; i < height - 1; ++i)
+	{
+		for (int j = 1; j < width - 1; ++j)
+		{
+			int resx = 0;
+			for (int a = -1; a < 2; ++a)
+			{
+				for (int b = -1; b < 2; ++b)
+				{
+					resx += gradx[a + 1][b + 1] * grayScaleMatrix[getVectorIndex(i + a, j + b)][0];
+				}
+			}
+
+			int resy = 0;
+			for (int a = -1; a < 2; ++a)
+			{
+				for (int b = -1; b < 2; ++b)
+				{
+					resy += grady[a + 1][b + 1] * grayScaleMatrix[getVectorIndex(i + a, j + b)][0];
+				}
+			}
+
+			int resSum = 0.5 * sqrt((resx * resx) + (resy * resy));
+			
+			if (resSum < 0)
+			{
+				resSum = 0;
+			}
+			
+			if (resSum > (colorDepth - 1))
+			{
+				resSum = colorDepth - 1;
+			}
+			const int curPix = getVectorIndex(i, j);
+			for (int k = 0; k < 3; ++k)
+			{
+				bordersMatrix[curPix][k] = resSum;
+			}
+		}
+	}
+	return bordersMatrix;
+};
+
+int Image::getVectorIndex(int x, int y)
+{
+	return (width * x) + y;
+}
 
 void Image::printHistogramToFile(string path = "", vector <unsigned int> histogramMatrix =  vector <unsigned int>())
 {
@@ -569,7 +739,7 @@ void Image::printImageToFile(string path = "", vector <vector <unsigned short in
 			// Write image headers
 			newImg << "P3" << endl;
 			newImg << width << " " << height << endl;
-			newImg << colorDepth << endl;
+			newImg << colorDepth - 1 << endl;
 			
 			const int matrixSize = img.size();
 			const unsigned short int channels = 3;

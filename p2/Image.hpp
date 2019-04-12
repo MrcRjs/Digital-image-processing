@@ -1,5 +1,4 @@
-#ifndef IMAGE_H
-#define IMAGE_H
+#pragma once
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -7,6 +6,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+#define _USE_MATH_DEFINES
 
 using namespace std;
 
@@ -33,6 +34,10 @@ class Image
 		vector <vector <unsigned short int>> getSubstMatrix(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getGammaCorrectedGrayscaleMatrix(float);
 		vector <vector <unsigned short int>> getExtensionUmbralMatrix(int lowerLimit, int upperLimit);
+		vector <vector <unsigned short int>> getBordersMatrix(void);
+		vector <vector <unsigned short int>> getBordersGradMatrix(void);
+		vector <vector <unsigned short int>> getLogaritmicMatrix(int);
+		vector <vector <unsigned short int>> getSinMatrix(void);
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
 		void printHistogramToFile(string, vector <unsigned int>);
 
@@ -51,6 +56,5 @@ class Image
 		void printComments(string *);
 		string getNextLine(void);
 		void populateMatrix(void);
+		int getVectorIndex(int, int);
 };
-
-#endif
