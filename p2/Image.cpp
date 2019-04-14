@@ -586,14 +586,14 @@ vector <vector <unsigned short int>> Image::getBordersMatrix()
 
 vector <vector <unsigned short int>> Image::getBordersGradMatrix()
 {
-	// Using Sobel operator
-	// https://en.wikipedia.org/wiki/Sobel_operator
 	const auto grayScaleMatrix = getGrayscaleMatrix("luma");
 	const int totalPixels = grayScaleMatrix.size();
 	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
 	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
-	vector <vector <unsigned short int>> bordersMatrix(totalPixels, vector <unsigned short int> (3, 0));
+	vector <vector <unsigned short int>> bordersGradMatrix(totalPixels, vector <unsigned short int> (3, 0));
 
+	// Using Sobel operator
+	// https://en.wikipedia.org/wiki/Sobel_operator
 	const short int gradx[3][3] = {
 		{ -1, 0, 1 },
 		{ -2, 0, 2 },
@@ -606,25 +606,16 @@ vector <vector <unsigned short int>> Image::getBordersGradMatrix()
 		{ 1, 2, 1 },
 	};
 
-/*
 
-	const short int gradx[3][3] = {
-		{ -1, -1, -1 },
-		{ -1, 8, -1 },
-		{ -1, -1, -1 },
-	};
-
-
-	const short int grady[3][3] = {
-		{ -1, -1, -1 },
-		{ -1, 8, -1 },
-		{ -1, -1, -1 },
-	};
-*/
+	// For each pixel, leaving one pixel border
+	// to operate neighbors
 	for (int i = 1; i < height - 1; ++i)
 	{
 		for (int j = 1; j < width - 1; ++j)
 		{
+			// For each kernel neighbor value
+			// First using gradient X to get horizontal borders
+			// Seconnd using gradient Y to get verticarl borders
 			int resx = 0;
 			for (int a = -1; a < 2; ++a)
 			{
@@ -643,8 +634,11 @@ vector <vector <unsigned short int>> Image::getBordersGradMatrix()
 				}
 			}
 
+			// Compute sum using absolute value
+			// multiplye by 1/2 to get light lines
 			int resSum = 0.5 * sqrt((resx * resx) + (resy * resy));
 			
+			// Normalize values between 0 and max possible value 
 			if (resSum < 0)
 			{
 				resSum = 0;
@@ -654,52 +648,60 @@ vector <vector <unsigned short int>> Image::getBordersGradMatrix()
 			{
 				resSum = colorDepth - 1;
 			}
+
+			// Set color value to each channel
 			const int curPix = getVectorIndex(i, j);
 			for (int k = 0; k < 3; ++k)
 			{
-				bordersMatrix[curPix][k] = resSum;
+				bordersGradMatrix[curPix][k] = resSum;
 			}
 		}
 	}
-	return bordersMatrix;
+	return bordersGradMatrix;
 };
 
 vector <vector <unsigned short int>> Image::getGaussMatrix()
 {
-	// Using Sobel operator
-	// https://en.wikipedia.org/wiki/Sobel_operator
 	const auto originalMatrix = matrix;
 	const int totalPixels = originalMatrix.size();
 	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
 	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
 	vector <vector <unsigned short int>> gaussMatrix(totalPixels, vector <unsigned short int> (3, 0));
 
-	const float gauss[3][3] = {
+	// Using kernel Gaussian blur 3x3
+	// https://en.wikipedia.org/wiki/Kernel_(image_processing)
+	const float kernelGauss[3][3] = {
 		{ 1/16.0, 2/16.0, 1/16.0 },
 		{ 2/16.0, 4/16.0, 2/16.0 },
 		{ 1/16.0, 2/16.0, 1/16.0 },
 	};
 
-
+	// For each pixel, leaving one pixel border
+	// to operate neighbors
 	for (int i = 1; i < height - 1; ++i)
 	{
 		for (int j = 1; j < width - 1; ++j)
 		{
+			// Used to calculate add the resultant blurred pixel values
 			vector <unsigned short int> resGauss(3, 0);
+
+			// For each kernel neighbor value
 			for (int a = -1; a < 2; ++a)
 			{
 				for (int b = -1; b < 2; ++b)
 				{
+					// For each channel
+					// Todo: implement n channel support
 					for (int c = 0; c < 3; ++c)
 					{
-						int convolution = gauss[a + 1][b + 1] * originalMatrix[getVectorIndex(i + a, j + b)][c];
-						//cout << convolution << endl;
-						resGauss[c] += convolution;
+						// Sum gauss[a][b] constant value multiplied by neighor[a][b] 
+						resGauss[c] += kernelGauss[a + 1][b + 1] * originalMatrix[getVectorIndex(i + a, j + b)][c];
 					}
 		
 				}
 			}
 
+			// Set pixel values to resultant matrix image
 			const int curPix = getVectorIndex(i, j);
 			gaussMatrix[curPix] = resGauss;
 		}
@@ -711,6 +713,12 @@ vector <vector <unsigned short int>> Image::getGaussMatrix()
 
 int Image::getVectorIndex(int x, int y)
 {
+	// Returns one-dimension vector[x] index
+	// given matrix[x][y] indexes
+	// Since Image.matrix is a vector of pixels
+	// when we need to do kernel operations
+	// it's easy to work with neighbors
+	// using [x][y] indexes
 	return (width * x) + y;
 }
 
