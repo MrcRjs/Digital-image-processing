@@ -664,6 +664,51 @@ vector <vector <unsigned short int>> Image::getBordersGradMatrix()
 	return bordersMatrix;
 };
 
+vector <vector <unsigned short int>> Image::getGaussMatrix()
+{
+	// Using Sobel operator
+	// https://en.wikipedia.org/wiki/Sobel_operator
+	const auto originalMatrix = matrix;
+	const int totalPixels = originalMatrix.size();
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> gaussMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+	const float gauss[3][3] = {
+		{ 1/16.0, 2/16.0, 1/16.0 },
+		{ 2/16.0, 4/16.0, 2/16.0 },
+		{ 1/16.0, 2/16.0, 1/16.0 },
+	};
+
+
+	for (int i = 1; i < height - 1; ++i)
+	{
+		for (int j = 1; j < width - 1; ++j)
+		{
+			vector <unsigned short int> resGauss(3, 0);
+			for (int a = -1; a < 2; ++a)
+			{
+				for (int b = -1; b < 2; ++b)
+				{
+					for (int c = 0; c < 3; ++c)
+					{
+						int convolution = gauss[a + 1][b + 1] * originalMatrix[getVectorIndex(i + a, j + b)][c];
+						//cout << convolution << endl;
+						resGauss[c] += convolution;
+					}
+		
+				}
+			}
+
+			const int curPix = getVectorIndex(i, j);
+			gaussMatrix[curPix] = resGauss;
+		}
+	}
+	return gaussMatrix;
+};
+
+
+
 int Image::getVectorIndex(int x, int y)
 {
 	return (width * x) + y;

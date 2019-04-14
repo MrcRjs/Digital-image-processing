@@ -38,6 +38,7 @@ class Image
 		vector <vector <unsigned short int>> getBordersGradMatrix(void);
 		vector <vector <unsigned short int>> getLogaritmicMatrix(int);
 		vector <vector <unsigned short int>> getSinMatrix(void);
+		vector <vector <unsigned short int>> getGaussMatrix();
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
 		void printHistogramToFile(string, vector <unsigned int>);
 
