@@ -103,6 +103,14 @@ Image::Image(string imgPath)
 	readImage(imgPath);
 }
 
+Image::Image(vector <vector <unsigned short int>> srcMatrix, int h, int w, int d)
+{
+	matrix = srcMatrix;
+	height = h;
+	width = w;
+	colorDepth = d;
+}
+
 Image::~Image(){}
 
 void Image::readImage(string file)
@@ -353,6 +361,38 @@ vector <vector <unsigned short int>> Image::getSumMatrix(vector <vector <unsigne
 		}
 	}
 	return sumMatrix;
+}
+
+vector <vector <unsigned short int>> Image::getSumFarsMatrix(vector <vector <unsigned short int>> imgA, vector <vector <unsigned short int>> imgB)
+{
+	if(imgA.size() == imgB.size()) {
+
+		const int totalPixels = imgA.size();
+
+		// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+		// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+		vector <vector <unsigned short int>> farsSumMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+		const int maxCol = colorDepth - 1;
+		// For each pixel set fars value
+		for (int p = 0; p < totalPixels; ++p)
+		{
+			for (int c = 0; c < 3; ++c)
+			{
+				int sum = imgA[p][c] + imgB[p][c];
+
+				// If sum < max posible color, set sum value
+				// else set max posible color
+				farsSumMatrix[p][c] = sum < maxCol ? sum : maxCol;
+			}
+		}
+		return farsSumMatrix;
+	}
+	else {
+		// throw err
+		cout << "Error: Images have different dimensions.";
+		return vector <vector <unsigned short int>>(0, vector<unsigned short int>(0,0));
+	}
 }
 
 vector <vector <unsigned short int>> Image::getSubstMatrix(vector <vector <unsigned short int>> imgA, vector <vector <unsigned short int>> imgB)
@@ -709,7 +749,157 @@ vector <vector <unsigned short int>> Image::getGaussMatrix()
 	return gaussMatrix;
 };
 
+vector <vector <unsigned short int>> Image::getGaussMatrix(vector <vector <unsigned short int>> sourceMatrix)
+{
+	const int totalPixels = sourceMatrix.size();
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> gaussMatrix(totalPixels, vector <unsigned short int> (3, 0));
 
+	// Using kernel Gaussian blur 3x3
+	// https://en.wikipedia.org/wiki/Kernel_(image_processing)
+	const float kernelGauss[3][3] = {
+		{ 1/16.0, 2/16.0, 1/16.0 },
+		{ 2/16.0, 4/16.0, 2/16.0 },
+		{ 1/16.0, 2/16.0, 1/16.0 },
+	};
+
+	// For each pixel, leaving one pixel border
+	// to operate neighbors
+	for (int i = 1; i < height - 1; ++i)
+	{
+		for (int j = 1; j < width - 1; ++j)
+		{
+			// Used to calculate add the resultant blurred pixel values
+			vector <unsigned short int> resGauss(3, 0);
+
+			// For each kernel neighbor value
+			for (int a = -1; a < 2; ++a)
+			{
+				for (int b = -1; b < 2; ++b)
+				{
+					// For each channel
+					// Todo: implement n channel support
+					for (int c = 0; c < 3; ++c)
+					{
+						// Sum gauss[a][b] constant value multiplied by neighor[a][b] 
+						resGauss[c] += kernelGauss[a + 1][b + 1] * sourceMatrix[getVectorIndex(i + a, j + b)][c];
+					}
+		
+				}
+			}
+
+			// Set pixel values to resultant matrix image
+			const int curPix = getVectorIndex(i, j);
+			gaussMatrix[curPix] = resGauss;
+		}
+	}
+	return gaussMatrix;
+};
+
+vector <vector <unsigned short int>> Image::getMeanMatrix(int n)
+{
+	auto operationsMatrix = matrix;
+	const int totalPixels = operationsMatrix.size();
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> meanMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+	// Using box blur 3x3 or aritmetic mean
+	// https://en.wikipedia.org/wiki/Kernel_(image_processing)
+	const float boxBlur = 1/9.0;
+
+	// For each pixel, leaving one pixel border
+	// to operate neighbors
+	for (int k = 0; k < n; ++k)
+	{
+		for (int i = 1; i < height - 1; ++i)
+		{
+			for (int j = 1; j < width - 1; ++j)
+			{
+				// Used to calculate add the resultant blurred pixel values
+				vector <unsigned short int> resBoxBlur(3, 0);
+
+				// For each kernel neighbor value
+				for (int a = -1; a < 2; ++a)
+				{
+					for (int b = -1; b < 2; ++b)
+					{
+						// For each channel
+						// Todo: implement n channel support
+						for (int c = 0; c < 3; ++c)
+						{
+							// Sum box blur 1/9 constant value multiplied by neighor[a][b] 
+							resBoxBlur[c] += boxBlur * operationsMatrix[getVectorIndex(i + a, j + b)][c];
+						}
+			
+					}
+				}
+
+				// Set pixel values to resultant matrix image
+				const int curPix = getVectorIndex(i, j);
+				meanMatrix[curPix] = resBoxBlur;
+			}
+		}
+		operationsMatrix = meanMatrix;
+	}
+	return meanMatrix;
+};
+
+vector <vector <unsigned short int>> Image::getMeanGeometricMatrix(int n)
+{
+	auto operationsMatrix = matrix;
+	const int totalPixels = operationsMatrix.size();
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> geoMeanMatrix(totalPixels, vector <unsigned short int> (3, 1));
+
+	// For each pixel, leaving one pixel border
+	// to operate neighbors
+	for (int k = 0; k < n; ++k)
+	{
+		for (int i = 1; i < height - 1; ++i)
+		{
+			for (int j = 1; j < width - 1; ++j)
+			{
+				// Used to convert float values to resultant unsigned short int values
+				vector <unsigned short int> resGeom(3, 1);
+				// Used as auxiliar to store float values
+				vector <float> resFloat(3, 1.0);
+
+				// For each kernel neighbor value
+				for (int a = -1; a < 2; ++a)
+				{
+					for (int b = -1; b < 2; ++b)
+					{
+						// For each channel
+						// Todo: implement n channel support
+						for (int c = 0; c < 3; ++c)
+						{
+							// geometric value = (X1 * X2 * ... * Xn) ^ (1/n)
+							float geomVal = pow(operationsMatrix[getVectorIndex(i + a, j + b)][c], 1/9.0);
+							// floating result = 1 if geometric value < 1
+							resFloat[c] *= geomVal >= 1 ? geomVal : 1;
+						}
+			
+					}
+				}
+
+				// Asign result rounding floating numer for each channel
+				for (int c = 0; c < 3; ++c)
+				{
+					resGeom[c] = round(resFloat[c]);
+				}
+
+				// Set pixel values to resultant matrix image
+				const int curPix = getVectorIndex(i, j);
+				geoMeanMatrix[curPix] = resGeom;
+			}
+		}
+		operationsMatrix = geoMeanMatrix;
+	}
+	return geoMeanMatrix;
+};
 
 int Image::getVectorIndex(int x, int y)
 {

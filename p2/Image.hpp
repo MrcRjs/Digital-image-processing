@@ -16,6 +16,7 @@ class Image
 	public:
 		Image();
 		Image(string);
+		Image(vector <vector <unsigned short int>>, int, int, int);
 		~Image();
 		void readImage(string);
 		int getHeight(void);
@@ -31,6 +32,7 @@ class Image
 		vector <unsigned int> getImageHistogram(unsigned short int, vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getGammaCorrectedMatrix(float);
 		vector <vector <unsigned short int>> getSumMatrix(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);
+		vector <vector <unsigned short int>> getSumFarsMatrix(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getSubstMatrix(vector <vector <unsigned short int>>, vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getGammaCorrectedGrayscaleMatrix(float);
 		vector <vector <unsigned short int>> getExtensionUmbralMatrix(int lowerLimit, int upperLimit);
@@ -38,7 +40,10 @@ class Image
 		vector <vector <unsigned short int>> getBordersGradMatrix(void);
 		vector <vector <unsigned short int>> getLogaritmicMatrix(int);
 		vector <vector <unsigned short int>> getSinMatrix(void);
-		vector <vector <unsigned short int>> getGaussMatrix();
+		vector <vector <unsigned short int>> getGaussMatrix(void);
+		vector <vector <unsigned short int>> getGaussMatrix(vector <vector <unsigned short int>>);
+		vector <vector <unsigned short int>> getMeanMatrix(int);
+		vector <vector <unsigned short int>> getMeanGeometricMatrix(int n);
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
 		void printHistogramToFile(string, vector <unsigned int>);
 
