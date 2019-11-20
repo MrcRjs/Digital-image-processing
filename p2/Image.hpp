@@ -44,6 +44,7 @@ class Image
 		vector <vector <unsigned short int>> getGaussMatrix(vector <vector <unsigned short int>>);
 		vector <vector <unsigned short int>> getMeanMatrix(int);
 		vector <vector <unsigned short int>> getMeanGeometricMatrix(int n);
+		vector <vector <unsigned short int>> getObjectsMatrix(void);
 		void printImageToFile(string, const vector <vector <unsigned short int>>);
 		void printHistogramToFile(string, vector <unsigned int>);
 

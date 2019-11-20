@@ -109,6 +109,7 @@ Image::Image(vector <vector <unsigned short int>> srcMatrix, int h, int w, int d
 	height = h;
 	width = w;
 	colorDepth = d;
+	magic = "P3";
 }
 
 Image::~Image(){}
@@ -899,6 +900,44 @@ vector <vector <unsigned short int>> Image::getMeanGeometricMatrix(int n)
 		operationsMatrix = geoMeanMatrix;
 	}
 	return geoMeanMatrix;
+};
+
+vector <vector <unsigned short int>> Image::getObjectsMatrix(void)
+{
+	auto operationsMatrix = getBinaryMatrix(128);
+	const int totalPixels = operationsMatrix.size();
+	// Construc vector of totalPixels size, each with a vector of size 3 and a value of 0
+	// {vector[0]{vector{0,0,0}}, vector[1]{vector{0,0,0}}, ... vector[totalPixels][{or{0,0,0}}}
+	vector <vector <unsigned short int>> objectsMatrix(totalPixels, vector <unsigned short int> (3, 0));
+
+	vector <unsigned short int> greenPixel = { 0, 255, 0};
+	vector <unsigned short int> blackPixel = { 0, 0, 0};
+
+	for (int i = 0; i < height - 1; ++i)
+	{
+		for (int j = 0; j < width - 1; ++j)
+		{/*
+			if (operationsMatrix[getVectorIndex(i,j)] == blackPixel)
+			{
+				bool obj = operationsMatrix[getVectorIndex(i,j)] == operationsMatrix[getVectorIndex(i + 1,j)]
+						&& operationsMatrix[getVectorIndex(i + 1,j)] == operationsMatrix[getVectorIndex(i,j + 1)];
+				
+				int vObjSize = 2;
+				int hObjSize = 2;
+				int hBiggestLine = 1;
+				int vBiggestLine = 1;
+				
+				while(operationsMatrix[getVectorIndex(i + 1,j)]) {
+
+				}
+			}
+			if(objDetected)
+			{
+				objectsMatrix[getVectorIndex(i,j)] = greenPixel;
+			}*/
+		}
+	}
+	return objectsMatrix;	
 };
 
 int Image::getVectorIndex(int x, int y)
